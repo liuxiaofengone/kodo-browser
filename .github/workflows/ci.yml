@@ -17,3 +17,8 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: make winarm64
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: kodo-browser-winarm64
+          path: build/*.zip
