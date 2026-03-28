@@ -21,28 +21,11 @@ watch:
 build:
 	yarn build
 
-win64: build
-	yarn build:win64
-	yarn pkg:win64
 winarm64: build
 	yarn build:winarm64
 	yarn pkg:winarm64
-win32: build
-	yarn build:win32
-	yarn pkg:win32
-linux64: build
-	yarn build:linux64
-	yarn pkg:linux64
-linux32: build
-	yarn build:linux32
-	yarn pkg:linux32
-mac: build
-	yarn build:mac
-	yarn pkg:mac
-dmg: mac
-	yarn build:dmg
 
-all:win32 win64 winarm64 linux32 linux64 mac
+all:winarm64
 	@echo 'Done'
 
-.PHONY:build i dev run clean prod watch win64 winarm64 win32 linux64 linux32 mac dmg all
+.PHONY:build i dev run clean prod watch winarm64 all
