@@ -24,6 +24,9 @@ build:
 win64: build
 	yarn build:win64
 	yarn pkg:win64
+winarm64: build
+	yarn build:winarm64
+	yarn pkg:winarm64
 win32: build
 	yarn build:win32
 	yarn pkg:win32
@@ -39,7 +42,7 @@ mac: build
 dmg: mac
 	yarn build:dmg
 
-all:win32 win64 linux32 linux64 mac
+all:win32 win64 winarm64 linux32 linux64 mac
 	@echo 'Done'
 
-.PHONY:build i dev run clean prod watch win64 win32 linux64 linux32 mac dmg all
+.PHONY:build i dev run clean prod watch win64 winarm64 win32 linux64 linux32 mac dmg all

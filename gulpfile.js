@@ -135,6 +135,40 @@ gulp.task("win64zip", done => {
   archive.finalize().then(done);
 });
 
+gulp.task("winarm64", done => {
+  console.log(`--package ${NAME}-win32-arm64`);
+  const targetDir = path.resolve(TARGET, `./${NAME}-win32-arm64`);
+
+  plugins.run(`rm -rf ${targetDir}`).exec(() => {
+    let options = Object.assign({}, packagerOptions);
+    options.platform = "win32";
+    options.arch = "arm64";
+    options.icon = `${BRAND}/qiniu.png`;
+
+    packager(options).then((paths) => {
+      fs.copyFileSync(
+        path.resolve(ROOT, `./${WIN_NO_SANDBOX_NAME}`),
+        path.resolve(targetDir, `./${WIN_NO_SANDBOX_NAME}`)
+      );
+      console.log("--done");
+      done();
+    }, (errs) => {
+      console.error(errs);
+    });
+  });
+});
+
+gulp.task("winarm64zip", done => {
+  console.log(`--package ${KICK_NAME}-win32-arm64-v${VERSION}.zip`);
+  const inputDir = `${TARGET}/${NAME}-win32-arm64`;
+  const outputZip = fs.createWriteStream(`${TARGET}/${KICK_NAME}-win32-arm64-v${VERSION}.zip`);
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  archive.on('error', (err) => { throw err; });
+  archive.pipe(outputZip);
+  archive.directory(inputDir, false);
+  archive.finalize().then(done);
+});
+
 gulp.task("win32", done => {
   console.log(`--package ${NAME}-win32-ia32`);
   const targetDir = path.resolve(TARGET, `./${NAME}-win32-ia32`);

@@ -40,3 +40,18 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: make mac
+  build-on-winarm64:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+      - name: test
+        run: make i test
+      - name: build
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: make winarm64

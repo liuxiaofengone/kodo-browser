@@ -26,6 +26,8 @@
     "pkg:win32": "./node_modules/.bin/gulp win32zip",
     "build:win64": "./node_modules/.bin/gulp win64",
     "pkg:win64": "./node_modules/.bin/gulp win64zip",
+    "build:winarm64": "./node_modules/.bin/gulp winarm64",
+    "pkg:winarm64": "./node_modules/.bin/gulp winarm64zip",
     "build:linux32": "./node_modules/.bin/gulp linux32",
     "pkg:linux32": "./node_modules/.bin/gulp linux32zip",
     "build:linux64": "./node_modules/.bin/gulp linux64",

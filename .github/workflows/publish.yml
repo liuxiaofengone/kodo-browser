@@ -134,6 +134,52 @@ jobs:
           asset_path: ./build/kodo-browser-win32-x86-${{ steps.vars.outputs.tag }}.zip
           asset_name: kodo-browser-win32-x86-${{ steps.vars.outputs.tag }}.zip
           asset_content_type: application/zip
+  release-windows-arm64:
+    name: release for windows/arm64
+    runs-on: windows-11-arm
+    needs: create_release
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - id: vars
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+      - name: Prepare qshell
+        run: |
+          set -e
+          curl -s -o ./qshell-v2.11.0-windows-amd64.zip https://devtools.qiniu.com/qshell-v2.11.0-windows-amd64.zip
+          unzip ./qshell-v2.11.0-windows-amd64.zip
+          ./qshell account -- "$PUBLISH_ACCESS_KEY" "$PUBLISH_SECRET_KEY" default
+        env:
+          PUBLISH_ACCESS_KEY: ${{ secrets.PUBLISH_ACCESS_KEY }}
+          PUBLISH_SECRET_KEY: ${{ secrets.PUBLISH_SECRET_KEY }}
+        shell: bash
+      - name: test
+        run: make i test
+      - name: build
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: make winarm64
+      - name: Upload Release Asset to Qiniu
+        run: |
+          set -e
+          ./qshell.exe rput --resumable-api-v2 --overwrite "$PUBLISH_BUCKET_NAME" "kodobrowser/client/kodo-browser-Windows-arm64-${{ steps.vars.outputs.tag }}.zip" "./build/kodo-browser-win32-arm64-${{ steps.vars.outputs.tag }}.zip"
+        shell: bash
+        env:
+          PUBLISH_BUCKET_NAME: ${{ secrets.PUBLISH_BUCKET_NAME }}
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./build/kodo-browser-win32-arm64-${{ steps.vars.outputs.tag }}.zip
+          asset_name: kodo-browser-win32-arm64-${{ steps.vars.outputs.tag }}.zip
+          asset_content_type: application/zip
   release-darwin-amd64:
     name: release for darwin/amd64
     runs-on: macos-latest
