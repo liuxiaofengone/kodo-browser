@@ -1,0 +1,16 @@
+node_modules
+.idea
+cache
+dist
+dist.asar
+npm-debug.log*
+bower_components
+build
+.DS_Store
+releases
+_up.sh
+package-lock.json
+*.download
+*.asar
+.nvmrc
+.claude

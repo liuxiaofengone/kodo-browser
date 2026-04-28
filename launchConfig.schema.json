@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/qiniu/kodo-browser/blob/master/lauchConfig.schema.json",
+  "title": "Kodo Browser Launch Config",
+  "description": "A config file to control the behavior in Kodo Browser Launching.",
+  "type": "object",
+  "properties": {
+    "preferredEndpointType": {
+      "description": "The default endpoint type to login.",
+      "type": "string"
+    },
+    "defaultPrivateEndpointConfig": {
+      "description": "This will generate the private endpoint config.",
+      "type": "object",
+      "properties": {
+        "required": [
+          "ucUrl"
+        ],
+        "ucUrl": {
+          "description": "The URL of Buckets Service.",
+          "type": "string"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "required": [
+                "id",
+                "endpoint"
+              ],
+              "id": {
+                "description": "The id of region.",
+                "type": "string"
+              },
+              "label": {
+                "description": "The region name displayed on UI.",
+                "type": "string"
+              },
+              "endpoint": {
+                "description": "The URL of S3 Service.",
+                "type": "string"
+              }
+            }
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "preferenceValidators": {
+      "description": "Change some validator properties for settings",
+      "type": "object",
+      "properties": {
+        "maxMultipartUploadPartSize": {
+          "description": "The max of multipart upload part size",
+          "type": "number"
+        },
+        "maxMultipartUploadConcurrency": {
+          "description": "The max of multipart upload part concurrency",
+          "type": "number"
+        },
+        "maxUploadJobConcurrency": {
+          "description": "The max of upload job concurrency",
+          "type": "number"
+        },
+        "maxDownloadJobConcurrency": {
+          "description": "The max of download job concurrency",
+          "type": "number"
+        }
+      }
+    },
+    "disable": {
+      "description": "To disable some functions.",
+      "type": "object",
+      "properties": {
+        "nonOwnedDomain": {
+          "description": "To disable using non-owned domain for preview and generate link.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
