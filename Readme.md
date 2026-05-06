@@ -1,209 +1,180 @@
-# KODO Browser
+# Kodo Browser（Windows ARM64 适配版）
 
-KODO Browser 参考 [OSS Browser](https://github.com/aliyun/oss-browser.git) 设计，提供类似 Windows 资源管理器功能。用户可以很方便的浏览文件，上传下载文件，支持断点续传等。
+本仓库基于 [qiniu/kodo-browser](https://github.com/qiniu/kodo-browser) 二次开发，在保留全部原始功能的基础上，新增了对 **Windows ARM64 架构**的原生打包支持，并修复了若干国内环境下的构建兼容性问题。
 
-本工具使用开源框架 [React](https://reactjs.org/) + [Electron](https://www.electronjs.org/) 制作。
+KODO Browser 参考 [OSS Browser](https://github.com/aliyun/oss-browser.git) 设计，提供类似 Windows 资源管理器的使用体验，支持文件浏览、上传/下载、断点续传等功能，底层使用 [React](https://reactjs.org/) + [Electron](https://www.electronjs.org/) 构建。
 
-> Electron 框架可以让你使用 JavaScript，HTML 和 CSS 构建跨平台的桌面应用程序。它是基于node.js 和 Chromium 开源项目。Electron 可以打包出跨平台的程序，运行在 Mac，Windows 和 Linux 上。
+---
 
 ## 相对于原始项目的改动
 
-本仓库基于 [qiniu/kodo-browser](https://github.com/qiniu/kodo-browser) 改造，主要变更如下：
+| # | 改动内容 | 说明 |
+|---|---------|------|
+| 1 | **新增 Windows ARM64 打包目标** | 在 `gulpfile.js` 中新增 `winArm64` / `winArm64zip` Gulp 任务，使用 Electron 18.3.3，适用于 Surface Pro X/9 等 ARM 设备 |
+| 2 | **放宽 Node.js 版本限制** | `package.json` 的 `engines.node` 从 `^14 \|\| ^16` 改为 `>=14`，支持 Node.js 18/20 LTS |
+| 3 | **修复 Node.js 17+ Webpack 构建兼容性** | `build` / `dev` / `watch` 脚本均添加 `NODE_OPTIONS=--openssl-legacy-provider`，解决 OpenSSL 3 兼容报错 |
+| 4 | **配置 Electron 国内下载镜像** | 新增 `.npmrc`，设置 `electron_mirror=https://npmmirror.com/mirrors/electron/`，避免 `yarn install` 时因 Electron 二进制下载失败而中断 |
+| 5 | **移除 GitHub CI/CD** | 删除 `.github/` 目录下的 GitHub Actions 工作流，避免推送后触发不必要的 CI 流程 |
 
-1. **新增 Windows ARM64 架构支持**：新增 `winArm64` 打包目标，可为 Windows ARM64 设备（如 Surface Pro X/9）构建原生应用包。
-2. **放宽 Node.js 版本限制**：`engines.node` 从 `^14 || ^16` 放宽为 `>=14`，支持最新 Node.js LTS 版本。
-3. **修复 Node.js 17+ 的 Webpack 构建兼容性**：为 `build`/`dev`/`watch` 脚本添加 `NODE_OPTIONS=--openssl-legacy-provider` 以兼容新版 Node.js。
-4. **配置 Electron 国内镜像**：添加 `.npmrc` 配置 npmmirror 镜像，解决国内下载 Electron 二进制包失败的问题。
-5. **移除 GitHub CI/CD**：删除了 `.github/` 目录下的 GitHub Actions 工作流配置。
-6. **添加 `.gitignore` 排除 `.claude`**：排除 Claude Code 相关配置文件。
+---
 
-## [使用手册 & 下载地址](https://developer.qiniu.com/kodo/tools/5972/kodo-browser)
-
-## 1. 功能介绍:
+## 功能介绍
 
 ```
-功能
-  |-- 登录：支持 AccessKey 和 SecretKey 登录
-  |-- Bucket 管理: 新建 bucket，删除 bucket。
-       |-- 文件管理：目录和文件的增删改查， 复制, 文件预览等。
-             |-- 文件传输任务管理： 上传下载，断点续传。
-  |-- 地址栏功能（支持 kodo://bucket/object，浏览历史前进后退，保存书签）
+Kodo Browser
+├── 登录：支持 AccessKey / SecretKey 登录
+├── Bucket 管理：新建、删除 Bucket
+│   └── 文件管理：目录与文件的增删改查、复制、预览
+│       └── 传输任务管理：上传/下载，断点续传
+└── 地址栏：支持 kodo://bucket/object 协议、浏览历史前进后退、书签
 ```
 
+官方使用手册：https://developer.qiniu.com/kodo/tools/5972/kodo-browser
 
-## 2. 开发环境搭建
+---
 
-> 如果你要在此基础上开发，请按照以下步骤进行。
+## 开发环境搭建
 
-### (1) 安装 Node.js >=14
+### 1. 安装 Node.js（>=14，推荐最新 LTS）
 
-官网: https://nodejs.org/
+官网：https://nodejs.org/
 
-### (2) 安装 yarn
+### 2. 安装 yarn
 
 ```bash
 npm install -g yarn
 ```
 
-### (3) 如果使用 Windows 系统，需要安装下列软件：
+### 3. Windows 额外依赖
 
-* 需要安装 git 和 choco:
-
-请自行下载安装。
-
-然后安装相关的依赖包。
+需要先安装 [git](https://git-scm.com/) 和 [Chocolatey](https://chocolatey.org/)，然后执行：
 
 ```bash
 choco install python vcredist-all make
 ```
 
-### (4) 下载代码
+### 4. 克隆代码并安装依赖
 
 ```bash
-git clone https://cnb.cool/liuxiaofengone/kodo-browser-windowsARM64.git
-```
-
-安装依赖:
-
-```bash
+git clone https://github.com/liuxiaofengone/kodo-browser-windowsarm64.git
+cd kodo-browser-windowsarm64
 yarn install
 ```
 
-### (5) 运行
+> 国内网络环境下，`.npmrc` 已配置 npmmirror 镜像，Electron 二进制包会自动从国内节点下载。
+
+### 5. 开发模式运行
 
 ```bash
-make run  # 开发模式运行，cmd+option+i 可用打开调试界面，Windows 或 Linux 按 F12
+make run
 ```
 
-开发模式下，会自动监听源码，如有修改，会自动 build 前端代码到 dist 目录。
+开发模式下，源码修改会自动触发前端重新构建。调试界面：macOS 按 `Cmd+Option+I`，Windows/Linux 按 `F12`。
 
-
-### (6) 打包
+### 6. 构建前端代码
 
 ```bash
-yarn build  # build 前端代码到 dist 目录
+yarn build
 ```
+
+### 7. 打包发行版
 
 ```bash
-make win64     # 打包 win64 程序
-make win32     # 打包 win32 程序
-make winArm64  # 打包 Windows ARM64 程序（适用于 Surface Pro X 等 ARM 设备）
-make mac       # 打包 mac 程序
-make dmg       # 打包 mac dmg 安装包
-make linux64   # 打包 linux64 程序
-make linux32   # 打包 linux32 程序
-make all       # 打包所有平台
+make winArm64   # Windows ARM64（新增，适用于 Surface Pro X/9 等 ARM 设备）
+make win64      # Windows x64
+make win32      # Windows x86
+make mac        # macOS
+make dmg        # macOS DMG 安装包
+make linux64    # Linux x64
+make linux32    # Linux x86
+make all        # 所有平台
 ```
 
-> Windows 用户如未安装 make，可直接使用等效的 yarn 命令（以 PowerShell 为例，使用 `;` 分隔）：
+> **Windows 用户若未安装 make**，可直接使用等效 yarn 命令（PowerShell 示例）：
 > ```powershell
 > yarn build; yarn build:winArm64; yarn pkg:winArm64
 > ```
 
+---
 
-## 3. 代码结构
+## 代码结构
 
 ```
 kodo-browser/
-├── build          # 打包好的 应用程序
-├── dist           # 打包好的 js 代码
-├── gulpfile.js
+├── build/           # 打包后的应用程序
+├── dist/            # Webpack 构建输出
+├── gulpfile.js      # Gulp 打包任务（含新增的 winArm64 目标）
 ├── package.json
-├── src
-│   ├── common     # 通用模块
-│   ├── main       # electron 主进程与子进程
-│   └── renderer   # 前端子进程
-└── webpack        # 打包工具
+├── .npmrc           # Electron 国内镜像配置（新增）
+├── src/
+│   ├── common/      # 通用模块（传输任务、七牛 SDK 封装等）
+│   ├── main/        # Electron 主进程
+│   └── renderer/    # 前端渲染进程（React）
+└── webpack/         # Webpack 配置
 ```
 
-## 4. 私有云配置
+---
 
-将配置文件放在 `$HOME/.kodo-browser-v2/config.json`（如果是 Windows 10，则位置是 `C:\Users\<UserName>\.kodo-browser-v2\config.json`）下，配置文件示例如下：
+## 私有云配置
+
+将配置文件放在 `$HOME/.kodo-browser-v2/config.json`（Windows 路径：`C:\Users\<用户名>\.kodo-browser-v2\config.json`）：
 
 ```json
 {
     "regions": [
-        {
-            "id": "cn-east-1",
-            "endpoint": "https://s3-cn-east-1.qiniucs.com"
-        },
-        {
-            "id": "cn-north-1",
-            "endpoint": "https://s3-cn-north-1.qiniucs.com"
-        },
-        {
-            "id": "cn-south-1",
-            "endpoint": "https://s3-cn-south-1.qiniucs.com"
-        },
-        {
-            "id": "us-north-1",
-            "endpoint": "https://s3-us-north-1.qiniucs.com"
-        },
-        {
-            "id": "ap-southeast-1",
-            "endpoint": "https://s3-ap-southeast-1.qiniucs.com"
-        }
+        { "id": "cn-east-1",       "endpoint": "https://s3-cn-east-1.qiniucs.com" },
+        { "id": "cn-north-1",      "endpoint": "https://s3-cn-north-1.qiniucs.com" },
+        { "id": "cn-south-1",      "endpoint": "https://s3-cn-south-1.qiniucs.com" },
+        { "id": "us-north-1",      "endpoint": "https://s3-us-north-1.qiniucs.com" },
+        { "id": "ap-southeast-1",  "endpoint": "https://s3-ap-southeast-1.qiniucs.com" }
     ],
     "uc_url": "https://uc.qbox.me"
 }
 ```
 
-可以修改配置文件示例中的 `endpoint` 来修改服务器地址。
+---
 
-## 5. OEM 定制
+## OEM 定制
 
-编辑 `src/renderer/customize.ts` 中的代码然后重新打包以定制部分 OEM 功能，目前支持的 OEM 定制有：
+编辑 `src/renderer/customize.ts` 后重新打包，可定制以下功能：
 
-* 禁止创建 Bucket
-* 禁止删除 Bucket
-* 禁止使用自有域名
-* 配置升级检测地址
+- 禁止创建 Bucket
+- 禁止删除 Bucket
+- 禁止使用自有域名
+- 配置升级检测地址
 
-## 6. 启动配置项
+---
 
-将在 Kodo Browser 启动时尝试读取此配置。如已定义该配置，则支持借此改变部分 Kodo Browser 初始行为； 如未定义，也不影响 Kodo Browser 正常启动。
+## 启动配置项（launchConfig.json）
 
-`launchConfig.json` 文件位于 Kodo Browser 可执行程序同级目录：
+将 `launchConfig.json` 放在可执行程序同级目录（Windows/Linux：`kodo-browser/`，macOS：`Kodo Browser.app/Contents/MacOS/`），可在启动时覆盖部分默认行为。格式参见 [launchConfig.schema.json](launchConfig.schema.json)，支持以下配置：
 
-* Windows/Linux：`kodo-browser/launchConfig.json`
-* macOS：`Kodo Browser.app/Contents/MacOS/launchConfig.json`
+- `preferredEndpointType`：登录默认服务端类型（`public` / `private`）
+- `defaultPrivateEndpointConfig`：私有云默认地址（`ucUrl`、`regions`）
+- `preferenceValidators`：上传/下载并发数等参数的校验范围
+- `disable.nonOwnedDomain`：禁止使用非自有域名
+- `baseShareUrl`：分享链接基础 URL
 
-`launchConfig.json` 的格式具体参见 [launchConfig.schema.json](launchConfig.schema.json)。当前支持以下配置：
-
-* `preferredEndpointType`，登录默认服务端类型。可用值：`public`（公有云）, `private`（私有云）；
-* `defaultPrivateEndpointConfig`，私有云服务默认地址；
-    * `ucUrl`，Bucket 管理服务地址，必须；
-    * `regions`，区域信息，对于较新的私有云可选，详细请向管理员询问；
-* `preferenceValidators`，配置部分设置表单的校验；并发越大传输速度不一定越快，请慎重调整。
-    * `maxMultipartUploadPartSize`，最大上传分片大小
-    * `maxMultipartUploadConcurrency`，最大上传分片并发数
-    * `maxUploadJobConcurrency`，最大上传任务并发数
-    * `maxDownloadJobConcurrency`，最大下载任务并发数
-* `disable`，禁止某些功能；
-    * `nonOwnedDomain`，非自有域名；
-* `baseShareUrl`，分享链接的基本 URL；
-
-例如以下配置将修改默认登录私有云指定服务端：
+示例：
 
 ```json
 {
-  "$schema": "https://github.com/qiniu/kodo-browser/blob/v2.1.0/lauchConfig.schema.json",
   "preferredEndpointType": "private",
   "defaultPrivateEndpointConfig": {
     "ucUrl": "http://uc.example.com",
     "regions": [
-      {
-        "id": "cn-east-1",
-        "label": "华东",
-        "endpoint": "http://s3.example.com"
-      }
+      { "id": "cn-east-1", "label": "华东", "endpoint": "http://s3.example.com" }
     ]
   }
 }
 ```
 
-当前 `$schema` 字段本身对程序运行无影响，但建议书写，表明当前配置文件是参考哪一版本编写的。
+---
 
-## 7. 开源 LICENSE
+## 上游项目
+
+- 原始仓库：[qiniu/kodo-browser](https://github.com/qiniu/kodo-browser)
+
+## License
 
 [Apache License 2.0](LICENSE)
